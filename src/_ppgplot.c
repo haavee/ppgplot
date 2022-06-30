@@ -20,12 +20,8 @@
 
 #include <cpgplot.h>
 
-#ifndef USE_NUMPY 
-#include <arrayobject.h>
-#else
 #include <numpy/arrayobject.h>
-#endif
-
+#include <numpy/ndarraytypes.h>
 /************************************************************************/
 
 /*
