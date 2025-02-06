@@ -8,6 +8,7 @@ version = "1.4"
 description = "Python bindings for PGPLOT"
 authors = [
     {name = "Nick Patavalis", email = "npat@efault.net"},
+    {name = "Marjolein Verkouter", email = "verkouter@jive.eu"},
 ]
 readme = "README.md"
 requires-python = ">=3.7"

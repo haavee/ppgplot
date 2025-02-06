@@ -8,6 +8,7 @@
  *    Linux (v2.4.x).
  * AUTHOR(S):
  *    Nick Patavalis (npat@efault.net)
+ *    Marjolein Verkouter (verkouter@jive.eu) - keep it alive
  * NOTES:
  *    - A few ppgplot functions have not been interfaced yet.
  *    - The pythonic calling conventions of some functions are *not*
@@ -20,11 +21,9 @@
 
 #include <cpgplot.h>
 
-#ifndef USE_NUMPY 
-#include <arrayobject.h>
-#else
+/* It's 2025, we only support numpy anymore */
 #include <numpy/arrayobject.h>
-#endif
+#include <numpy/ndarraytypes.h>
 
 /************************************************************************/
 
@@ -75,32 +74,59 @@ float xcurs=0.0, ycurs=0.0;
 static PyObject *
 tofloatvector (PyObject *o, float **v, int *vsz)
 {
-    PyArrayObject *a1, *af1, *af2;
-    PyArray_Descr *descr;
-    npy_intp dims;
-    int ownedaf1=0;
+    /* Set up for transforming to array of floats */
+    int const     requirements = NPY_ARRAY_FORCECAST|NPY_ARRAY_C_CONTIGUOUS|NPY_ARRAY_ALIGNED;
+    npy_intp      dims;
+    PyArray_Descr *descr = PyArray_DescrFromType(NPY_FLOAT); 
+    PyArrayObject *af=NULL;
 
-    /* Check if args are arrays. */
+    /* Check if args is array */
     if (!PyArray_Check(o)) {
-		PyErr_SetString(PpgTYPEErr,"object is not an array");
-		return(NULL);
-    }
-    a1 = (PyArrayObject *)o;
-    /* Check if args are vectors. */
-    if (a1->nd != 1) {
-		PyErr_SetString(PpgTYPEErr,"object is not a vector");
-		return(NULL);
-    }
-    
+        /* Nope, but maybe it can be converted to an array  - note, 1D only! */
+        if( (af=(PyArrayObject*)PyArray_FromAny(o, descr, 1 /*min_depth*/, 1/*max_depth*/, requirements, NULL/*context*/))==NULL ) {
+            PyErr_SetString(PpgTYPEErr,"cannot cast input to vector of floats");
+            return NULL;
+        }
+    } else {
+        /* Yes, already an array, check dims and try to convert */
+        PyArrayObject *a1 = (PyArrayObject *)o;
+
 #ifdef DEBUG_TOARRAY
-    fprintf(stderr,"(tofloatvector): array type = %d\n",a1->descr->type_num);
+        fprintf(stderr,"(tofloatvector): array type = %d\n",a1->descr->type_num);
 #endif
 
+        /* Check if args are vectors. */
+        if( PyArray_NDIM(a1)!=1) {
+            PyErr_SetString(PpgTYPEErr, "object is not a vector");
+            return NULL;
+        }
+
+        /* Get a FLOAT array out of the current array */
+        if( (af=(PyArrayObject*)PyArray_FromArray(a1, descr, requirements))==NULL ) {
+            PyErr_SetString(PpgTYPEErr, "cannot cast vector to floats");
+            return NULL;
+        }
+    }
+
+    /* af1 now points at a new array object.
+     * Ask the library to transform it into a C-Array */
+    if( PyArray_AsCArray((PyObject **)&af, (void *)v, &dims, 1, descr) == -1) {
+        PyErr_SetString(PpgTYPEErr, "cannot cast array to C-array of floats");
+        return NULL;
+    }
+    *vsz = dims;
+    /* Tell the system we have this object */
+    Py_INCREF(af);
+    return (PyObject *)af;
+
+#if 0
     switch (a1->descr->type_num) {
     case PyArray_FLOAT:
 		af1 = a1;
 		break;
+#ifdef PyArray_CHAR
     case PyArray_CHAR:
+#endif
 #ifndef USE_NUMARRAY 
     case PyArray_UBYTE: 
 #endif
@@ -124,7 +150,6 @@ tofloatvector (PyObject *o, float **v, int *vsz)
 		return(NULL);
 		break;
     }
-    
 #ifdef DEBUG_TOARRAY
     fprintf(stderr,"(tofloatvector): array type = %d\n",a1->descr->type_num);
 #endif
@@ -140,6 +165,7 @@ tofloatvector (PyObject *o, float **v, int *vsz)
     if (ownedaf1) { Py_DECREF(af1); }
 
     return((PyObject *)af2);
+#endif    
 }
 
 /*************************************************************************/
@@ -147,6 +173,9 @@ tofloatvector (PyObject *o, float **v, int *vsz)
 static PyObject *
 tofloatmat(PyObject *o, float **m, int *nr, int *nc)
 {
+  PyErr_SetString(PpgTYPEErr, "tofloatmat not implemented yet");
+    return NULL;
+#if 0
     PyArrayObject *a1, *af1, *af2;
     PyArray_Descr *descr;
     npy_intp dims[2];
@@ -228,6 +257,7 @@ tofloatmat(PyObject *o, float **m, int *nr, int *nc)
 bailout:
     if (ownedaf1) { Py_DECREF(af1); }
     return((PyObject *)af2);
+#endif
 }
 
 /**************************************************************************/
