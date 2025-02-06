@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=45", "numpy>=1.21.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ppgplot"
+version = "1.4"
+description = "Python bindings for PGPLOT"
+authors = [
+    {name = "Nick Patavalis", email = "npat@efault.net"},
+]
+readme = "README.md"
+requires-python = ">=3.7"
+dependencies = [
+    "numpy>=1.21.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/haavee/ppgplot"
+
+[tool.setuptools]
+packages = ["ppgplot"]
+package-dir = {"ppgplot" = "src"}
