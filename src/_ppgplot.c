@@ -80,7 +80,7 @@ tofloatvector (PyObject *o, float **v, int *vsz)
     PyArray_Descr *descr = PyArray_DescrFromType(NPY_FLOAT); 
     PyArrayObject *af=NULL;
 
-    /* Check if args is array */
+    /* Check if arg is array */
     if (!PyArray_Check(o)) {
         /* Nope, but maybe it can be converted to an array  - note, 1D only! */
         if( (af=(PyArrayObject*)PyArray_FromAny(o, descr, 1 /*min_depth*/, 1/*max_depth*/, requirements, NULL/*context*/))==NULL ) {
@@ -90,10 +90,6 @@ tofloatvector (PyObject *o, float **v, int *vsz)
     } else {
         /* Yes, already an array, check dims and try to convert */
         PyArrayObject *a1 = (PyArrayObject *)o;
-
-#ifdef DEBUG_TOARRAY
-        fprintf(stderr,"(tofloatvector): array type = %d\n",a1->descr->type_num);
-#endif
 
         /* Check if args are vectors. */
         if( PyArray_NDIM(a1)!=1) {
@@ -118,157 +114,92 @@ tofloatvector (PyObject *o, float **v, int *vsz)
     /* Tell the system we have this object */
     Py_INCREF(af);
     return (PyObject *)af;
-
-#if 0
-    switch (a1->descr->type_num) {
-    case PyArray_FLOAT:
-		af1 = a1;
-		break;
-#ifdef PyArray_CHAR
-    case PyArray_CHAR:
-#endif
-#ifndef USE_NUMARRAY 
-    case PyArray_UBYTE: 
-#endif
-#ifdef PyArray_SBYTE
-    case PyArray_SBYTE:
-#endif
-    case PyArray_SHORT:
-    case PyArray_INT:
-#ifndef USE_NUMARRAY
-    case PyArray_LONG:
-#endif
-    case PyArray_DOUBLE:
-		if (!(af1 = (PyArrayObject *)PyArray_Cast(a1,PyArray_FLOAT))) {
-			PyErr_SetString(PpgTYPEErr,"cannot cast vector to floats");
-			return(NULL);
-		}
-		ownedaf1 = 1;
-		break;
-    default:
-		PyErr_SetString(PpgTYPEErr,"cannot cast vector to floats");
-		return(NULL);
-		break;
-    }
-#ifdef DEBUG_TOARRAY
-    fprintf(stderr,"(tofloatvector): array type = %d\n",a1->descr->type_num);
-#endif
-    
-    af2 = af1;
-    descr = PyArray_DescrFromType(PyArray_FLOAT); 
-    if (PyArray_AsCArray((PyObject **)&af2, (void *)v, &dims, 1,
-                         descr) == -1) {
-		af2 = NULL;
-    }
-    *vsz = dims;
-
-    if (ownedaf1) { Py_DECREF(af1); }
-
-    return((PyObject *)af2);
-#endif    
 }
 
 /*************************************************************************/
 
 static PyObject *
-tofloatmat(PyObject *o, float **m, int *nr, int *nc)
+tofloatmat(PyObject *o, float ***m, int *nr, int* nc)
 {
-  PyErr_SetString(PpgTYPEErr, "tofloatmat not implemented yet");
-    return NULL;
-#if 0
-    PyArrayObject *a1, *af1, *af2;
-    PyArray_Descr *descr;
-    npy_intp dims[2];
-    int ownedaf1=0;
-    char **tmpdat;
-    
-    /* Check if args are arrays. */
+    /* Set up for transforming to array of floats */
+    int const     requirements = NPY_ARRAY_FORCECAST|NPY_ARRAY_C_CONTIGUOUS|NPY_ARRAY_ALIGNED;
+    npy_intp      dims[2];
+    PyArray_Descr *descr = PyArray_DescrFromType(NPY_FLOAT); 
+    PyArrayObject *af=NULL;
+
+    /* Check if arg is array */
     if (!PyArray_Check(o)) {
-		PyErr_SetString(PpgTYPEErr,"object is not and array");
-		return(NULL);
+        /* Nope, but maybe it can be converted to an array  - note, 2D only! */
+        if( (af=(PyArrayObject*)PyArray_FromAny(o, descr, 2 /*min_depth*/, 2/*max_depth*/, requirements, NULL/*context*/))==NULL ) {
+            PyErr_SetString(PpgTYPEErr,"cannot cast input to matrix of floats");
+            return NULL;
+        }
+    } else {
+        /* Yes, already an array, check dims and try to convert */
+        PyArrayObject *a1 = (PyArrayObject *)o;
+
+        /* Check if arg is matrix. */
+        if( PyArray_NDIM(a1)!=2) {
+            PyErr_SetString(PpgTYPEErr, "object is not a matrix");
+            return NULL;
+        }
+
+        /* Get a FLOAT array out of the current array */
+        if( (af=(PyArrayObject*)PyArray_FromArray(a1, descr, requirements))==NULL ) {
+            PyErr_SetString(PpgTYPEErr, "cannot cast matrix to floats");
+            return NULL;
+        }
     }
-    a1 = (PyArrayObject *)o;
-    /* Check if args are matrices. */
-    if (a1->nd != 2) {
-		PyErr_SetString(PpgTYPEErr,"object is not a matrix");
-		return(NULL);
-    }
-    
-#ifdef DEBUG_TOARRAY
-    fprintf(stderr,"(tofloatmat): array type = %d\n",a1->descr->type_num);
-#endif
-    
-    switch (a1->descr->type_num) {
-    case PyArray_FLOAT:
-		af1 = a1;
-		break;
-    case PyArray_CHAR: 
-#ifndef USE_NUMARRAY
-    case PyArray_UBYTE: 
-#endif
-#ifdef PyArray_SBYTE
-    case PyArray_SBYTE:
-#endif
-    case PyArray_SHORT: 
-    case PyArray_INT: 
-#ifndef USE_NUMARRAY
-    case PyArray_LONG:
-#endif
-    case PyArray_DOUBLE:
-		if (!(af1 = (PyArrayObject *)PyArray_Cast(a1,PyArray_FLOAT))) {
-			PyErr_SetString(PpgTYPEErr,"cannot cast matrix to floats");
-			return(NULL);
-		}
-		ownedaf1 = 1;
-		break;
-    default:
-		PyErr_SetString(PpgTYPEErr,"cannot cast matrix to floats");
-		return(NULL);
-		break;
-    }
-    
-#ifdef DEBUG_TOARRAY
-    fprintf(stderr,"(tofloatmat): array type = %d\n",a1->descr->type_num);
-#endif
-    
-    af2 = af1;
-    descr = PyArray_DescrFromType(PyArray_FLOAT); 
-    if (PyArray_AsCArray((PyObject **)&af2, (void *)&tmpdat, dims, 2,
-                         descr) == -1) {
-		af2 = NULL;
-		goto bailout;
+
+    /* af1 now points at a new array object.
+     * Ask the library to transform it into a C-Array */
+    if( PyArray_AsCArray((PyObject **)&af, (void *)m, &dims, 2, descr) == -1) {
+        PyErr_SetString(PpgTYPEErr, "cannot cast array to C-array of floats");
+        return NULL;
     }
     *nr = dims[0];
     *nc = dims[1];
-    
-    /* WARNING: What follows is a little tricky and I dunno if I'm 
-       really allowed to do this. On the other hand it really conserves 
-       time and memory! So this assert statement will make sure that 
-       the program *will* blow in your face if what I'm doing here 
-       turns-out be bogus. */
-    assert((af2->dimensions[1] * af2->descr->elsize) == af2->strides[0]);
-    
-    /* Phew! we 're clear! */
-    *m = (float *)(*tmpdat);
-    /* tmpdat was malloc'ed inside PyArray_As2D. We must free it.
-       Look at the code of PyArray_As2D for details... */
-    free(tmpdat);
-
-bailout:
-    if (ownedaf1) { Py_DECREF(af1); }
-    return((PyObject *)af2);
-#endif
+    /* Tell the system we have this object */
+    Py_INCREF(af);
+    return (PyObject *)af;
 }
+
 
 /**************************************************************************/
 
 #ifdef DEBUG_TOARRAY
 
-PYF(tstmat)
+PYF(tstvec)
 {
     PyObject *o=NULL;
     PyArrayObject *af=NULL;
     float *v;
+    int i=0,j=0, n=0;
+    
+    if(!PyArg_ParseTuple(args,"O",&o)) return(NULL);
+    
+    if (!(af =(PyArrayObject *)tofloatvector(o,&v,&n))) goto fail;
+    
+    for (i=0; i<n; i++) {
+        fprintf(stderr, "%f\t",v[i]);
+        if( i>0 && (i%10)==0 )
+    		fprintf(stderr, "\n");
+    }
+    fprintf(stderr, "\n");
+
+    Py_DECREF(af);
+    PYRN;
+
+fail:
+    if (af) Py_DECREF(af);
+    return(NULL);
+}
+
+PYF(tstmat)
+{
+    PyObject *o=NULL;
+    PyArrayObject *af=NULL;
+    float **v;
     int i=0,j=0, nc=0, nr=0;
     
     if(!PyArg_ParseTuple(args,"O",&o)) return(NULL);
@@ -276,9 +207,13 @@ PYF(tstmat)
     if (!(af =(PyArrayObject *)tofloatmat(o,&v,&nr,&nc))) goto fail;
     
     for (i=0; i<nr; i++) {
-		for(j=0; j<nc; j++)
-			fprintf(stderr,"%f\t",v[i*nc+j]);
-		fprintf(stderr,"\n");
+        fprintf(stderr, "ROW[%d]:", i);
+		for(j=0; j<nc; j++) {
+            if( (j%10)==0 )
+                fprintf(stderr, "\n\t");
+			fprintf(stderr, "%f\t",v[i][j]);
+        }
+		fprintf(stderr, "\n");
     }
 
     Py_DECREF(af);
@@ -2380,7 +2315,8 @@ static PyMethodDef PpgMethods[] = {
     {"pgqwin", pgqwin, 1},
 
 /* END ADDED */
-#ifdef DEBUG
+#ifdef DEBUG_TOARRAY
+    {"tstvec", tstvec, 1},
     {"tstmat", tstmat, 1},
 #endif
 
@@ -2416,13 +2352,13 @@ moduleinit(void)
 #endif
     d = PyModule_GetDict(m);
 #if PY_MAJOR_VERSION <= 2
-    PpgIOErr = PyString_FromString("_ppgplot.ioerror");
+    PpgIOErr   = PyString_FromString("_ppgplot.ioerror");
     PpgTYPEErr = PyString_FromString("_ppgplot.typeerror");
-    PpgMEMErr = PyString_FromString("_ppgplot.memerror");
+    PpgMEMErr  = PyString_FromString("_ppgplot.memerror");
 #else
-    PpgIOErr = PyBytes_FromString("_ppgplot.ioerror");
-    PpgTYPEErr = PyBytes_FromString("_ppgplot.typeerror");
-    PpgMEMErr = PyBytes_FromString("_ppgplot.memerror");
+    PpgIOErr   = PyErr_NewException("_ppgplot.ioerror", NULL, NULL);
+    PpgTYPEErr = PyErr_NewException("_ppgplot.typeerror", NULL, NULL);
+    PpgMEMErr  = PyErr_NewException("_ppgplot.memerror", NULL, NULL);
 #endif
     PyDict_SetItemString(d, "ioerror", PpgIOErr);
     PyDict_SetItemString(d, "typeerror", PpgTYPEErr);
