@@ -2,14 +2,17 @@ from setuptools import setup, Extension
 import os
 import sys
 import platform
+import operator
 # these deps are listed in pyproject.toml so should be able to import w/o probs
 import numpy
 import pkgconfig
 
 
 def add_pgplot_from_giza(ext):
-    # Very convenient
+    # Very convenient - but also breaks the build on Linux (Deb12) *sigh*
+    # adds an empty string [''] to ext.extra_compile_args
     pkgconfig.configure_extension(ext, 'giza', static=True)
+    ext.extra_compile_args = list( filter(operator.truth, ext.extra_compile_args) )
     # But not sufficient ...
     ext.libraries.extend( ['cpgplot', 'pgplot'] )
     return ext
@@ -57,6 +60,26 @@ def add_X11(ext):
     )
     return ext
 
+def print_config(ext):
+    print("===> Extension contents")
+    print(f"\tname = {ext.name}")
+    print(f"\tsources = {ext.sources}")
+    print(f"\tlibraries = {ext.libraries}")
+    print(f"\tdefine_macros = {ext.define_macros}")
+    print(f"\tundef_macros = {ext.undef_macros}")
+    print(f"\tlibrary_dirs = {ext.library_dirs}")
+    print(f"\tinclude_dirs = {ext.include_dirs}")
+    print(f"\textra_link_args = {ext.extra_link_args}")
+    print(f"\truntime_library_dirs = {ext.runtime_library_dirs}")
+    print(f"\textra_objects = {ext.extra_objects}")
+    print(f"\textra_compile_args = {ext.extra_compile_args}")
+    print(f"\texport_symbols = {ext.export_symbols}")
+    print(f"\tswig_opts = {ext.swig_opts}")
+    print(f"\tdepends = {ext.depends}")
+    print(f"\tlanguage = {ext.language}")
+    print(f"\toptional = {ext.optional}")
+    print(f"\tpy_limited_api = {ext.py_limited_api}")
+    return ext
 
 # This is the main Extension configuration step
 # We go over the dependencies, each of which
@@ -76,6 +99,8 @@ def set_extension_config(ext):
         add_pgplot_from_pgplot_dir(ext, pgplot_dir)
     else:
         add_pgplot_from_giza(ext)
+    # uncomment and run "pip -v install [-e] ." to see output
+    #print_config(ext)
     return ext
 
 ###########################################################
