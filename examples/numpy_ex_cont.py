@@ -1,6 +1,6 @@
 #/usr/bin/env python
 
-from numpy import *
+import numpy as np
 from ppgplot import *
 
 # initialize ploting.
@@ -12,11 +12,11 @@ pglab("x","y","z = cos(.3*sqrt(2*x) - .4*y/3)*cos(.4*x/3) + (x-y)/40.0")
 pgiden()                 # put user-name and date on plot.
 
 # calculate a suitable function.
-surf = zeros([40,40], dtype=float32)
+surf = np.zeros([40,40], dtype=np.float32)
 for i in range(1,41):
     for j in range(1,41):
-        surf[i-1,j-1] = cos(.3*sqrt(2*i) - .4*j/3)*cos(.4*i/3) + (i-j)/40.0
-mns, mxs = min(ravel(surf)), max(ravel(surf))
+        surf[i-1,j-1] = np.cos(.3*np.sqrt(2*i) - .4*j/3)*np.cos(.4*i/3) + (i-j)/40.0
+mns, mxs = min(np.ravel(surf)), max(np.ravel(surf))
 
 
 # do the ploting.
@@ -29,8 +29,7 @@ for i in range(10):      # label the contours.
     pgconl_s(surf,c,str(i))
 pgsci(1)                 # set colndx back to 1 (white)
 	                 # plot a wedge to the right of the image.
-pgwedg_s(max(ravel(surf)),min(ravel(surf)), "RG")
+pgwedg_s(max(np.ravel(surf)),min(np.ravel(surf)), "RG")
 
 #close the plot.
 pgend()
-

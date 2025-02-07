@@ -2,15 +2,16 @@
 #
 #  pgex1: freely taken after PGDEMO1.F
 #
-import ppgplot, numpy
+import ppgplot
+import numpy as np
 import sys
 
 # create an array 
 xs=[1.,2.,3.,4.,5.]
-ys=numpy.array([1.,4.,9.,16.,25.])
+ys=np.array([1.,4.,9.,16.,25.])
 
 # creat another array
-yr = 0.1*numpy.array(range(0,60))
+yr = 0.1*np.array(range(0,60))
 xr = yr*yr
 
 

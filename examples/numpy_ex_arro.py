@@ -1,6 +1,6 @@
 #/usr/bin/env python
 
-from numpy import *
+import numpy as np
 from ppgplot import *
 
 # initialize ploting.
@@ -11,9 +11,9 @@ pgswin(-10,10,-10,10)    # set axis ranges.
 pgiden()                 # put user-name and date on plot.
 
 # calculate a suitable function.
-f = arange(0,2*pi,0.25)
-fx = cos(f);
-fy = sin(f);
+f = np.arange(0,2*np.pi,0.25)
+fx = np.cos(f);
+fy = np.sin(f);
 
 for i in range(f.shape[0]):
     pgslw(i%10+1)           # set line-width

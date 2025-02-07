@@ -1,15 +1,15 @@
 #/usr/bin/env python
 
-from numpy import *
+import math
 from ppgplot import *
 
-s602 = sin(pi/3) / 2
-c602 = cos(pi/3) / 2
+s602 = math.sin(math.pi/3) / 2
+c602 = math.cos(math.pi/3) / 2
 
 def drawtriangle (p1, p2, p3, i):
     if (i > 5) :
         return
-    l = sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
+    l = math.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
     pgmove(p1[0], p1[1])
     pgdraw(p2[0], p2[1])
     pgdraw(p3[0], p3[1])
@@ -29,7 +29,7 @@ def drawtriangle (p1, p2, p3, i):
 l = 1
 p1 = [0,0]
 p2 = [l,0]
-p3 = [cos(pi/3), sin(pi/3)]
+p3 = [math.cos(math.pi/3), math.sin(math.pi/3)]
 
 print(p3)
 

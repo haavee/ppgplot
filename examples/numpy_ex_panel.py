@@ -1,6 +1,6 @@
 #/usr/bin/env python
 
-from numpy import *
+import numpy as np
 from ppgplot import *
 
 def fixenv (xrange=[0,1], yrange=[0,1], fname="none", ci = 2):
@@ -18,23 +18,23 @@ pgiden()                 # put user-name and date on plot.
 pgask(1)                 # wait for user to press a key before erasing.
 
 # calculate some suitable functions.
-x = arange(0.01,6*pi,0.1)
-y = zeros([2,2,x.shape[0]], dtype=float64)
-label = zeros([2,2], dtype=str)
-y[0,0] = sin(2*x)/x
+x = np.arange(0.01,6*np.pi,0.1)
+y = np.zeros([2,2,x.shape[0]], dtype=np.float64)
+label = np.zeros([2,2], dtype=str)
+y[0,0] = np.sin(2*x)/x
 label[0,0] = "sin(2*x)/x"
-y[1,0] = sin(2*x)
+y[1,0] = np.sin(2*x)
 label[1,0] = "sin(2*x)"
-y[0,1] = x*sin(2*x)
+y[0,1] = x*np.sin(2*x)
 label[0,1] = "x*sin(2*x)"
-y[1,1] = sin(x) + sin(2*x) + sin(3*x)
+y[1,1] = np.sin(x) + np.sin(2*x) + np.sin(3*x)
 label[1,1] = "sin(x) + sin(2*x) + sin(3*x)"
 
 # do the plotting
 for i in range(2):
     for j in range(2):
         pgpanl(i+1,j+1)
-        fixenv([0.0,6*pi],[min(y[i,j]),max(y[i,j])],label[i,j], i*2+j+2)
+        fixenv([0.0,6*np.pi],[min(y[i,j]),max(y[i,j])],label[i,j], i*2+j+2)
         pgslw(6);          # set line-width to 6/201.
         pgsls(i*2+j+1)     # set the line style.
         pgline(x,y[i,j])   # plot the line.
