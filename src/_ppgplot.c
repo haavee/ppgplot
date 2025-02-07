@@ -22,7 +22,11 @@
 #include <cpgplot.h>
 
 /* It's 2025, we only support numpy anymore */
-#include <numpy/arrayobject.h>
+#ifndef NPY_TARGET_VERSION
+    #define NPY_TARGET_VERSION NPY_API_VERSION
+#endif
+#define NPY_NO_DEPRECATED_API NPY_TARGET_VERSION/*NPY_1_7_API_VERSION*/
+#include <numpy/ndarrayobject.h>
 #include <numpy/ndarraytypes.h>
 
 /************************************************************************/
@@ -119,7 +123,7 @@ tofloatvector (PyObject *o, float **v, int *vsz)
 /*************************************************************************/
 
 static PyObject *
-tofloatmat(PyObject *o, float ***m, int *nr, int* nc)
+tofloatmat(PyObject *o, float **m, int *nr, int* nc)
 {
     /* Set up for transforming to array of floats */
     int const     requirements = NPY_ARRAY_FORCECAST|NPY_ARRAY_C_CONTIGUOUS|NPY_ARRAY_ALIGNED;
@@ -153,7 +157,7 @@ tofloatmat(PyObject *o, float ***m, int *nr, int* nc)
 
     /* af1 now points at a new array object.
      * Ask the library to transform it into a C-Array */
-    if( PyArray_AsCArray((PyObject **)&af, (void *)m, &dims, 2, descr) == -1) {
+    if( PyArray_AsCArray((PyObject **)&af, (void *)m, &dims[0], 2, descr) == -1) {
         PyErr_SetString(PpgTYPEErr, "cannot cast array to C-array of floats");
         return NULL;
     }
