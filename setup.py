@@ -2,205 +2,89 @@ from setuptools import setup, Extension
 import os
 import sys
 import platform
+# these deps are listed in pyproject.toml so should be able to import w/o probs
+import numpy
+import pkgconfig
 
-#dbf = open('/tmp/build.log', 'w')
-#def mprint(s):
-#    print(s, file=dbf)
-mprint=lambda *_: None
 
-def get_pgplot_library_config():
-    libraries = []
-    library_dirs = []
-    runtime_library_dirs = []
-    extra_link_args = []
-    include_dirs = []
-    
+def add_pgplot_from_giza(ext):
+    # Very convenient
+    pkgconfig.configure_extension(ext, 'giza', static=True)
+    # But not sufficient ...
+    ext.libraries.extend( ['cpgplot', 'pgplot'] )
+    return ext
+
+# Configure the Extension based on stuff found in PGPLOT_DIR
+def add_pgplot_from_pgplot_dir(ext, pgplotdir):
+    if not os.path.isdir(pgplotdir):
+        raise RuntimeError(f"$PGPLOT_DIR [{pgplotdir}] is not a directory")
+    darwin    = 'darwin' in platform.system().lower()
+    soext     = 'dylib' if darwin else 'so'
+    mk_rpath  = ("-Wl,-rpath,{0}" if darwin else "-Wl,-rpath={0}").format
+    mk_lib    = f"lib{{0}}.{soext}".format
+    # Find libcpgplot
+    lib       = mk_lib("cpgplot")
+    for path, _, files in os.walk(pgplotdir):
+        if lib not in files:
+            continue
+        # OK found it!
+        # Configure runtime library paths
+        ext.extra_link_args.append( mk_rpath(path) )
+
+        # Because we're overriding system settings, add
+        # the libraries with absolute path
+        ext.extra_link_args.extend( map(lambda l: os.path.join(path, l),
+                                        map(mk_lib, ['cpgplot', 'pgplot'])) )
+        ext.runtime_library_dirs.append( path )
+        ext.include_dirs.append( os.path.join(pgplotdir, "include") )
+        break
+    else:
+        raise RuntimeError(f"Could not find libcpgplot in $PGPLOT_DIR [{pgplotdir}]")
+    return ext
+
+# Extract useful info from the numpy module
+def add_numpy(ext):
+    ext.include_dirs.append( numpy.get_include() )
+    return ext
+
+# Set up X11 libraries, searching standard (Linux...) paths
+def add_X11(ext):
+    ext.libraries.extend(['X11', 'm'])
+    # Standard X11 library locations
+    ext.library_dirs.extend(
+            filter(os.path.isdir,
+                   ["/usr/lib/x86_64-linux-gnu/", "/usr/X11R6/lib/", "/opt/X11/lib"])
+    )
+    return ext
+
+
+# This is the main Extension configuration step
+# We go over the dependencies, each of which
+# can modify the build env as needed
+def set_extension_config(ext):
+    # yah ... maybe later if we grow up widen this
     if os.name != "posix":
         raise Exception("OS not supported")
-        
-    # Base libraries needed on POSIX systems
-    libraries.extend(["X11", "m"])
-    
-    # Standard X11 library locations
-    for ld in filter(os.path.isdir, ["/usr/lib/x86_64-linux-gnu/", "/usr/X11R6/lib/", "/opt/X11/lib"]):
-        library_dirs.append(ld)
-    
-    # Handle PGPLOT/Giza configuration
-    soext = 'dylib' if platform.system() == 'Darwin' else 'so'
-    pgplotdir = os.environ.get("PGPLOT_DIR")
-    
-    if pgplotdir:
-        if not os.path.isdir(pgplotdir):
-            raise RuntimeError(f"$PGPLOT_DIR [{pgplotdir}] is not a directory")
-            
-        # Find libcpgplot
-        for path, _, files in os.walk(pgplotdir):
-            mprint(f"Inspecting files {files}")
-            if f'libcpgplot.{soext}' in files:
-                mprint(f" => found libcpgplot.{soext}")
-                # Configure library paths and linking
-                if platform.system() != 'Darwin':
-                    extra_link_args.append(f"-Wl,-rpath={path}")
-                    mprint(" adding '-Wl,-rpath={path}'")
-                else:
-                    extra_link_args.append(f"-Wl,-rpath,{path}")
-                    mprint(" adding '-Wl,-rpath,{path}'")
 
-                extra_link_args.extend([
-                    os.path.join(path, f"libcpgplot.{soext}"),
-                    os.path.join(path, f"libpgplot.{soext}")
-                ])
-                runtime_library_dirs.append(path)
-                include_dirs.append(os.path.join(pgplotdir, "include"))
-                break
-        else:
-            raise RuntimeError(f"Could not find libcpgplot in $PGPLOT_DIR [{pgplotdir}]")
-    # MacOS X SCISOFT support
-    elif 'SCIDIR' in os.environ:
-        libraries.append("aquaterm")
-        library_dirs.append(os.path.join(os.environ["SCIDIR"], 'lib'))
+    # modify the extension to taste
+    add_X11(ext)
+    add_numpy(ext)
+
+    # Where to source pgplot from
+    pgplot_dir = os.environ.get('PGPLOT_DIR', None)
+    if pgplot_dir is not None:
+        add_pgplot_from_pgplot_dir(ext, pgplot_dir)
     else:
-        print("PGPLOT_DIR env var not defined, hoping libcpgplot is in system path(s)", file=sys.stderr)
-        libraries.extend(["cpgplot", "pgplot"])
+        add_pgplot_from_giza(ext)
+    return ext
 
-    mprint(f"DONE:\n\tlibraries={libraries}\n\tlibrary_dirs={library_dirs}\n\textra_link_args={extra_link_args}\n\tinclude_dirs={include_dirs}")
-    
-    return {
-        'libraries': libraries,
-        'library_dirs': library_dirs,
-        'runtime_library_dirs': runtime_library_dirs,
-        'extra_link_args': extra_link_args,
-        'include_dirs': include_dirs
-    }
-
-def get_extension_config():
-    try:
-        import numpy
-        include_dirs = [numpy.get_include()]
-        define_macros = [('USE_NUMPY', None), ('NPY_NO_DEPRECATED_API',  'NPY_1_7_API_VERSION')]
-        undef_macros = ['USE_NUMARRAY']
-    except ImportError:
-        raise Exception("numpy is required for building ppgplot")
-    
-    pgplot_config = get_pgplot_library_config()
-    include_dirs.extend(pgplot_config['include_dirs'])
-    
-    return Extension('ppgplot._ppgplot',
-                    sources=[os.path.join('src', '_ppgplot.c')],
-                    include_dirs=include_dirs,
-                    libraries=pgplot_config['libraries'],
-                    library_dirs=pgplot_config['library_dirs'],
-                    runtime_library_dirs=pgplot_config['runtime_library_dirs'],
-                    extra_link_args=pgplot_config['extra_link_args'],
-                    define_macros=define_macros,
-                    undef_macros=undef_macros)
+###########################################################
+#             This triggers the whole build               #
+###########################################################
 setup(
         ext_modules=[
-            get_extension_config(),
+            set_extension_config( Extension('ppgplot._ppgplot',
+                                            sources=[os.path.join('src', '_ppgplot.c')]) ),
         ]
 )
 
-#setup(
-#    ext_modules=[
-#        Extension(
-#            name="ppgplot",
-#            sources=["src/_ppgplot.c"],
-#        ),
-#    ]
-#)
-#
-#import os
-#import sys
-#import platform
-#
-#def get_pgplot_library_config():
-#    libraries = []
-#    library_dirs = []
-#    runtime_library_dirs = []
-#    extra_link_args = []
-#    include_dirs = []
-#    
-#    if os.name != "posix":
-#        raise Exception("OS not supported")
-#        
-#    # Base libraries needed on POSIX systems
-#    libraries.extend(["X11", "m"])
-#    
-#    # Standard X11 library locations
-#    for ld in filter(os.path.isdir, ["/usr/lib/x86_64-linux-gnu/", "/usr/X11R6/lib/", "/opt/X11/lib"]):
-#        library_dirs.append(ld)
-#    
-#    # Handle PGPLOT/Giza configuration
-#    soext = 'dylib' if platform.system() == 'Darwin' else 'so'
-#    pgplotdir = os.environ.get("PGPLOT_DIR")
-#    
-#    if pgplotdir:
-#        if not os.path.isdir(pgplotdir):
-#            raise RuntimeError(f"$PGPLOT_DIR [{pgplotdir}] is not a directory")
-#            
-#        # Find libcpgplot
-#        for path, _, files in os.walk(pgplotdir):
-#            if f'libcpgplot.{soext}' in files:
-#                # Configure library paths and linking
-#                if platform.system() != 'Darwin':
-#                    extra_link_args.append(f"-Wl,-rpath={path}")
-#                extra_link_args.extend([
-#                    os.path.join(path, f"libcpgplot.{soext}"),
-#                    os.path.join(path, f"libpgplot.{soext}")
-#                ])
-#                runtime_library_dirs.append(path)
-#                include_dirs.append(os.path.join(pgplotdir, "include"))
-#                break
-#        else:
-#            raise RuntimeError(f"Could not find libcpgplot in $PGPLOT_DIR [{pgplotdir}]")
-#    
-#    # MacOS X SCISOFT support
-#    elif 'SCIDIR' in os.environ:
-#        libraries.append("aquaterm")
-#        library_dirs.append(os.path.join(os.environ["SCIDIR"], 'lib'))
-#    else:
-#        print("PGPLOT_DIR env var not defined, hoping libcpgplot is in system path(s)", file=sys.stderr)
-#        libraries.extend(["cpgplot", "pgplot"])
-#    
-#    return {
-#        'libraries': libraries,
-#        'library_dirs': library_dirs,
-#        'runtime_library_dirs': runtime_library_dirs,
-#        'extra_link_args': extra_link_args,
-#        'include_dirs': include_dirs
-#    }
-#
-#def get_extension_config():
-#    try:
-#        import numpy
-#        include_dirs = [numpy.get_include()]
-#        define_macros = [('USE_NUMPY', None)]
-#        undef_macros = ['USE_NUMARRAY']
-#    except ImportError:
-#        raise Exception("numpy is required for building ppgplot")
-#    
-#    pgplot_config = get_pgplot_library_config()
-#    include_dirs.extend(pgplot_config['include_dirs'])
-#    
-#    return Extension('ppgplot._ppgplot',
-#                    sources=[os.path.join('src', '_ppgplot.c')],
-#                    include_dirs=include_dirs,
-#                    libraries=pgplot_config['libraries'],
-#                    library_dirs=pgplot_config['library_dirs'],
-#                    runtime_library_dirs=pgplot_config['runtime_library_dirs'],
-#                    extra_link_args=pgplot_config['extra_link_args'],
-#                    define_macros=define_macros,
-#                    undef_macros=undef_macros)
-#
-#if __name__ == '__main__':
-#    setup(
-#        name="ppgplot",
-#        version="1.4",
-#        description="Python / Numeric-Python bindings for PGPLOT",
-#        author="Nick Patavalis",
-#        author_email="npat@efault.net",
-#        url="http://code.google.com/p/ppgplot/ https://github.com/haavee/ppgplot",
-#        packages=["ppgplot"],
-#        package_dir={"ppgplot": "src"},
-#        ext_modules=[get_extension_config()]
-#    )
