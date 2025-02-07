@@ -115,7 +115,8 @@ tofloatvector (PyObject *o, float **v, int *vsz)
         return NULL;
     }
     *vsz = dims;
-    /* Tell the system we have this object */
+    /* Tell the system we have this object and the data descriptor */
+    Py_INCREF(descr);
     Py_INCREF(af);
     return (PyObject *)af;
 }
@@ -163,7 +164,8 @@ tofloatmat(PyObject *o, float **m, int *nr, int* nc)
     }
     *nr = dims[0];
     *nc = dims[1];
-    /* Tell the system we have this object */
+    /* Tell the system we have this object and the data type descriptor */
+    Py_INCREF(descr);
     Py_INCREF(af);
     return (PyObject *)af;
 }
