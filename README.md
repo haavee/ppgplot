@@ -18,10 +18,23 @@ Currently, as the extension is not in PyPI, you're installing it into an "extern
 - numpy >= 1.21.0
 - PGPLOT or Giza libraries installed
 - X11 development libraries
+- pkg-config 
+
+### Installing the dependencies
+
+On Linux use your favourite package manager, e.g.:
+```bash
+$> sudo apt-get install giza-dev libx11-dev pkg-config
+```
+
+Successful installation using [Homebrew](https://brew.sh) on Mac OSX with:
+```bash
+$> brew install libx11 giza pkgconf
+```
 
 ## Installation
 
-In principle, this extension should build out-of-the-box in a Python `venv`.
+In principle, this extension should build out-of-the-box in a Python `venv`, or, if you have it, a `conda` virtual environment (untested at the moment).
 The [`pyproject.toml`](pyproject.toml) file lists all dependencies and should (...) pull them into the `venv` as required for building/deploying:
 
 ```bash
@@ -46,10 +59,11 @@ $> PGPLOT_DIR=/path/to/pgplot pip install [-e] .
 
 ## Notes
 
-FORTRAN? Srsly? Actually, for plotting large numbers of points or simple, yet precise control of the graphics, the FORTRAN based PGPLOT backend is still a lot faster than most tools like `matplotlib` or `Giza`
+FORTRAN? Srsly? Actually, for plotting large numbers of points or simple, yet precise control of the graphics, the FORTRAN based PGPLOT backend is convenient and _fast_ (a _lot_ faster than `matplotlib`, and still noticeably faster than `Giza`). However, the upside of investing those compute cycles is that the (anti-aliased!) fonts and graphics produced by the [`cairo`](https://www.cairographics.org) library (the _actual_ graphics backend used by `Giza`) are of an amazing quality.
 
-The `Giza` backend is an amazing job done, but it is [not 100% compatible with the original PGPLOT](https://danieljprice.github.io/giza/documentation/pgplot.html), so it is not guaranteed your plots will come out identical.
+If `ppgplot` is linked against the `Giza` library, it can produce output in `.png` and `.pdf`, also not something to be sneezed at.
 
-This fork owes a lot of thanks to the original author of `ppgplot`:
+All in all, the `Giza` backend is an amazing job done, but it is [not 100% compatible with the original PGPLOT](https://danieljprice.github.io/giza/documentation/pgplot.html), so it is not guaranteed your plots will come out identical.
+
+This fork of the Python-extension owes a lot of thanks to the original author of `ppgplot`:
   https://github.com/npat-efault/ppgplot
-
