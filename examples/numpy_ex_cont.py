@@ -12,10 +12,10 @@ pglab("x","y","z = cos(.3*sqrt(2*x) - .4*y/3)*cos(.4*x/3) + (x-y)/40.0")
 pgiden()                 # put user-name and date on plot.
 
 # calculate a suitable function.
-surf = zeros([40,40],Float32)
+surf = zeros([40,40], dtype=float32)
 for i in range(1,41):
     for j in range(1,41):
-	surf[i-1,j-1] = cos(.3*sqrt(2*i) - .4*j/3)*cos(.4*i/3) + (i-j)/40.0
+        surf[i-1,j-1] = cos(.3*sqrt(2*i) - .4*j/3)*cos(.4*i/3) + (i-j)/40.0
 mns, mxs = min(ravel(surf)), max(ravel(surf))
 
 

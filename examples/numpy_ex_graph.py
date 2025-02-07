@@ -6,7 +6,7 @@ import ppgplot, numpy
 import sys
 
 # create an array 
-xs=numpy.array([1.,2.,3.,4.,5.])
+xs=[1.,2.,3.,4.,5.]
 ys=numpy.array([1.,4.,9.,16.,25.])
 
 # creat another array
@@ -20,7 +20,7 @@ if len(sys.argv) > 1: # if we got an argument use the argument as devicename
 else:
 	ppgplot.pgopen('?')
 ppgplot.pgenv(0.,10.,0.,20.,0,1)
-ppgplot.pglab('(x)', '(y)', 'PGPLOT Example 1:  y = x\u2')
+ppgplot.pglab('(x)', '(y)', r'PGPLOT Example 1:  y = x\u2')
 ppgplot.pgpt(xs,ys,9)
 ppgplot.pgline(xr,yr)
 ppgplot.pgclos()
