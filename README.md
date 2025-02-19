@@ -11,6 +11,7 @@ manipulate vectors and matrices.
 
 Currently, as the extension is not in PyPI, you're installing it into an "externally managed environment". You may need to create a Python [`venv`](https://docs.python.org/3/library/venv.html) first in order to install the extension manually on your system.
 
+Note: there is a [separate old-python-3.6 branch](https://github.com/haavee/ppgplot/tree/old-python-3.6) based off master, with a how-to in the commit log(s). Of course nothing works out of the box on that system - only succeeded using an (old) Anaconda3.6 base package. YMMV.
 
 ## Requirements
 
