@@ -20,11 +20,11 @@ def add_pgplot_from_giza(ext):
 # Configure the Extension based on stuff found in PGPLOT_DIR
 def add_pgplot_from_pgplot_dir(ext, pgplotdir):
     if not os.path.isdir(pgplotdir):
-        raise RuntimeError(f"$PGPLOT_DIR [{pgplotdir}] is not a directory")
+        raise RuntimeError("$PGPLOT_DIR [{0}] is not a directory".format(pgplotdir))
     darwin    = 'darwin' in platform.system().lower()
     soext     = 'dylib' if darwin else 'so'
     mk_rpath  = ("-Wl,-rpath,{0}" if darwin else "-Wl,-rpath={0}").format
-    mk_lib    = f"lib{{0}}.{soext}".format
+    mk_lib    = "lib{{0}}.{0}".format(soext).format
     # Find libcpgplot
     lib       = mk_lib("cpgplot")
     for path, _, files in os.walk(pgplotdir):
@@ -42,7 +42,7 @@ def add_pgplot_from_pgplot_dir(ext, pgplotdir):
         ext.include_dirs.append( os.path.join(pgplotdir, "include") )
         break
     else:
-        raise RuntimeError(f"Could not find libcpgplot in $PGPLOT_DIR [{pgplotdir}]")
+        raise RuntimeError("Could not find libcpgplot in $PGPLOT_DIR [{0}]".format(pgplotdir))
     return ext
 
 # Extract useful info from the numpy module
@@ -62,23 +62,23 @@ def add_X11(ext):
 
 def print_config(ext):
     print("===> Extension contents")
-    print(f"\tname = {ext.name}")
-    print(f"\tsources = {ext.sources}")
-    print(f"\tlibraries = {ext.libraries}")
-    print(f"\tdefine_macros = {ext.define_macros}")
-    print(f"\tundef_macros = {ext.undef_macros}")
-    print(f"\tlibrary_dirs = {ext.library_dirs}")
-    print(f"\tinclude_dirs = {ext.include_dirs}")
-    print(f"\textra_link_args = {ext.extra_link_args}")
-    print(f"\truntime_library_dirs = {ext.runtime_library_dirs}")
-    print(f"\textra_objects = {ext.extra_objects}")
-    print(f"\textra_compile_args = {ext.extra_compile_args}")
-    print(f"\texport_symbols = {ext.export_symbols}")
-    print(f"\tswig_opts = {ext.swig_opts}")
-    print(f"\tdepends = {ext.depends}")
-    print(f"\tlanguage = {ext.language}")
-    print(f"\toptional = {ext.optional}")
-    print(f"\tpy_limited_api = {ext.py_limited_api}")
+    print("\tname = {ext.name}", **locals())
+    print("\tsources = {ext.sources}", **locals())
+    print("\tlibraries = {ext.libraries}", **locals())
+    print("\tdefine_macros = {ext.define_macros}", **locals())
+    print("\tundef_macros = {ext.undef_macros}", **locals())
+    print("\tlibrary_dirs = {ext.library_dirs}", **locals())
+    print("\tinclude_dirs = {ext.include_dirs}", **locals())
+    print("\textra_link_args = {ext.extra_link_args}", **locals())
+    print("\truntime_library_dirs = {ext.runtime_library_dirs}", **locals())
+    print("\textra_objects = {ext.extra_objects}", **locals())
+    print("\textra_compile_args = {ext.extra_compile_args}", **locals())
+    print("\texport_symbols = {ext.export_symbols}", **locals())
+    print("\tswig_opts = {ext.swig_opts}", **locals())
+    print("\tdepends = {ext.depends}", **locals())
+    print("\tlanguage = {ext.language}", **locals())
+    print("\toptional = {ext.optional}", **locals())
+    print("\tpy_limited_api = {ext.py_limited_api}", **locals())
     return ext
 
 # This is the main Extension configuration step
