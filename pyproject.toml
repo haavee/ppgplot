@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ppgplot"
-version = "1.4"
+version = "1.5"
 description = "Python bindings for PGPLOT"
 authors = [
     {name = "Nick Patavalis", email = "npat@efault.net"},
