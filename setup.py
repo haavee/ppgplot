@@ -107,6 +107,7 @@ def set_extension_config(ext):
 #             This triggers the whole build               #
 ###########################################################
 setup(
+        name="python-pgplot",
         ext_modules=[
             set_extension_config( Extension('ppgplot._ppgplot',
                                             sources=[os.path.join('src', '_ppgplot.c')]) ),

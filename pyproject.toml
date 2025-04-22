@@ -1,14 +1,14 @@
 [build-system]
-requires = ["setuptools>=45", "numpy>=1.21.0", "pkgconfig"]
+requires = ["setuptools>=45", "numpy>=1.21.0", "pkgconfig", "wheel", "cibuildwheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "python-pgplot"
-version = "1.5"
+version = "1.5.1"
 description = "Python bindings for PGPLOT"
 authors = [
-    {name = "Nick Patavalis", email = "npat@efault.net"},
     {name = "Marjolein Verkouter", email = "verkouter@jive.eu"},
+    #{name = "Nick Patavalis", email = "npat@efault.net"},
 ]
 readme = "README.md"
 requires-python = ">=3.7"
