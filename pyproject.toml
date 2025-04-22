@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "python-pgplot"
-version = "1.5.1"
+version = "1.5.0-beta"
 description = "Python bindings for PGPLOT"
 authors = [
     {name = "Marjolein Verkouter", email = "verkouter@jive.eu"},
