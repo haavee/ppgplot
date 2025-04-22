@@ -3,7 +3,7 @@ requires = ["setuptools>=45", "numpy>=1.21.0", "pkgconfig"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ppgplot"
+name = "python-pgplot"
 version = "1.5"
 description = "Python bindings for PGPLOT"
 authors = [

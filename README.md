@@ -9,9 +9,26 @@ written in Fortran by T. J. Pearson. C bindings for PGPLOT are also available.
 numarray modules, but nowadays (>= Feb 2025) replaced by Numpy, to efficiently represent and
 manipulate vectors and matrices.
 
-Currently, as the extension is not in PyPI, you're installing it into an "externally managed environment". You may need to create a Python [`venv`](https://docs.python.org/3/library/venv.html) first in order to install the extension manually on your system.
+## Installing
 
-Note: there is a [separate old-python-3.6 branch](https://github.com/haavee/ppgplot/tree/old-python-3.6) based off master, with a how-to in the commit log(s). Of course nothing works out of the box on that system - only succeeded using an (old) Anaconda3.6 base package. YMMV.
+Since `v1.5` (Apr 2025) the package should be `pip`-installable; it's a package on the [PyPI](https://pypi.org/project/python-pgplot/):
+
+```bash
+    $> pip install python-pgplot
+    $> python3
+    >>> import ppgplot
+    >>>
+```
+**NOTE: Due to a package name collision, the PyPI project name is `python-pgplot`; the obvious package name was already claimed by something completely different**
+
+
+It is also possible to build the package from this `git`-repository. You may need to create a Python [`venv`](https://docs.python.org/3/library/venv.html) first. See below for detailed instructions.
+
+```bash
+    $> pip install [-e] .
+```
+
+**Note:** there is a [separate old-python-3.6 branch](https://github.com/haavee/ppgplot/tree/old-python-3.6) based off master, with a how-to in the commit log(s). Of course nothing works out of the box on that system - only succeeded using an (old) Anaconda3.6 base package. YMMV.
 
 ## Requirements
 
