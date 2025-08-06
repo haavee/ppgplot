@@ -15,6 +15,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install O/S level dependencies
+        shell: bash
         run: |
              if [ "$RUNNER_OS" == "Linux" ]; then
                 sudo apt-get install giza-dev libx11-dev pkg-config
