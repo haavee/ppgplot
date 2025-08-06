@@ -23,7 +23,7 @@ jobs:
              else
                 # must be MacOS then ...
                 brew install libx11 giza pkgconf
-             endif
+             fi
 
       - name: Set up Python
         uses: actions/setup-python@v5
