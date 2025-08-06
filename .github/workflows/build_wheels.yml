@@ -14,6 +14,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install O/S level dependencies
+        run: |
+             if [ "$RUNNER_OS" == "Linux" ]; then
+                sudo apt-get install giza-dev libx11-dev pkg-config
+             elif [ "$RUNNER_OS" == "Windows" ]; then
+                echo "Really should find out how to install those here"
+             else
+                # must be MacOS then ...
+                brew install libx11 giza pkgconf
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
