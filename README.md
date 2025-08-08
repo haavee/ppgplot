@@ -83,5 +83,5 @@ If `ppgplot` is linked against the `Giza` library, it can produce output in `.pn
 
 All in all, the `Giza` backend is an amazing job done, but it is [not 100% compatible with the original PGPLOT](https://danieljprice.github.io/giza/documentation/pgplot.html), so it is not guaranteed your plots will come out identical.
 
-This fork of the Python-extension owes a lot of thanks to the original author, Nick Patavlis, of `ppgplot`:
+This fork of the Python-extension owes a lot of thanks to the original author, Nick Patavalis, of `ppgplot`:
   https://github.com/npat-efault/ppgplot
