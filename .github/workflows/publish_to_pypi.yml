@@ -11,10 +11,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest ] #, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]  # add windows-latest later
 
     steps:
       - uses: actions/checkout@v4
+
+      # Dependencies are now handled by cibuildwheel's before-all hooks
+      # No need to install them on the runner
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -28,11 +31,40 @@ jobs:
 
       - name: Build wheels
         run: cibuildwheel --output-dir dist
+        env:
+          # Install system dependencies and build giza from source
+          # giza-devel is not available in AlmaLinux 8 EPEL, so we build from source
+          # Install build dependencies for RHEL/CentOS/AlmaLinux
+          # Fallback for Debian/Ubuntu systems
+          # Download and build giza from source
+          CIBW_BEFORE_ALL_LINUX: |
+            (which apt || which yum || which dnf) &&
+            ((yum install -y gcc make cairo-devel libX11-devel pkgconfig wget tar gzip) ||
+             (apt-get update && apt-get install -y gcc make libcairo2-dev libx11-dev pkg-config wget tar gzip)) &&
+            cd /tmp &&
+            wget https://github.com/danieljprice/giza/archive/refs/tags/v1.4.2.tar.gz &&
+            tar -xzf v1.4.2.tar.gz &&
+            cd giza-1.4.2 &&
+            export CFLAGS=-fPIC &&
+            ./configure --prefix=/usr/local &&
+            make &&
+            make install &&
+            ldconfig
+          CIBW_BEFORE_ALL_MACOS: "brew install giza libx11 pkg-config"
+          CIBW_BEFORE_ALL_WINDOWS: "echo 'Windows support not implemented yet'"
+          # Ensure pkg-config and runtime linker can find giza
+          CIBW_ENVIRONMENT_LINUX: "PKG_CONFIG_PATH=/usr/local/lib/pkgconfig LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH"
+          CIBW_ENVIRONMENT_MACOS: "MACOSX_DEPLOYMENT_TARGET=14.0 PKG_CONFIG_PATH=$(brew --prefix)/lib/pkgconfig DYLD_FALLBACK_LIBRARY_PATH=$(brew --prefix)/lib:$DYLD_FALLBACK_LIBRARY_PATH"
+          # Avoid universal2 since Homebrew giza isn’t universal
+          CIBW_ARCHS_MACOS: "native"
+          # Smoke test to verify import/linking works inside each wheel env
+          CIBW_TEST_COMMAND: >
+            python -c 'import ppgplot; print("ok")'
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: python-pgplot-wheels
+          name: python-pgplot-wheels-${{ matrix.os }}
           path: dist/
 
   publish_pypi:
