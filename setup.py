@@ -56,7 +56,7 @@ def add_X11(ext):
     # Standard X11 library locations
     ext.library_dirs.extend(
             filter(os.path.isdir,
-                   ["/usr/lib/x86_64-linux-gnu/", "/usr/X11R6/lib/", "/opt/X11/lib"])
+                   ["/usr/lib/x86_64-linux-gnu/", "/usr/X11R6/lib/", "/opt/X11/lib", "/opt/homebrew/lib"])
     )
     return ext
 
