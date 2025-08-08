@@ -4,6 +4,13 @@ on:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:  # Manual trigger for testing
+    inputs:
+      dry_run:
+        description: 'Dry run (skip actual PyPI upload)'
+        required: false
+        default: 'true'
+        type: boolean
 
 jobs:
   build_wheels:
@@ -125,7 +132,15 @@ jobs:
           twine check dist/*
 
       - name: Publish to PyPI
+        if: ${{ !inputs.dry_run }}
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: twine upload dist/*
+
+      - name: Dry run - show what would be uploaded
+        if: ${{ inputs.dry_run }}
+        run: |
+          echo "DRY RUN: Would upload the following files to PyPI:"
+          ls -la dist/
+          echo "Files passed twine check - ready for upload!"
