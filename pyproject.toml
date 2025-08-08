@@ -36,3 +36,9 @@ Homepage = "https://github.com/haavee/ppgplot"
 [tool.setuptools]
 packages = ["ppgplot"]
 package-dir = {"ppgplot" = "src"}
+
+[tool.cibuildwheel]
+# Test that giza is available
+before-build = "pkg-config --exists giza && echo 'giza found' || echo 'giza NOT found'"
+# Not on Windhoos, nor on musllinux (wtf)
+skip = ["*-win*", "*musllinux*" ]
