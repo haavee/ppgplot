@@ -8,6 +8,13 @@ import numpy
 import pkgconfig
 
 
+def is_building_sdist():
+    """Detect if we're building a source distribution (sdist)"""
+    # Check for sdist-related commands in sys.argv
+    sdist_commands = ['sdist', 'egg_info', 'dist_info']
+    return any(cmd in sys.argv for cmd in sdist_commands)
+
+
 def add_pgplot_from_giza(ext):
     # Very convenient - but also breaks the build on Linux (Deb12) *sigh*
     # adds an empty string [''] to ext.extra_compile_args
@@ -88,6 +95,11 @@ def set_extension_config(ext):
     # yah ... maybe later if we grow up widen this
     if os.name != "posix":
         raise Exception("OS not supported")
+
+    # Skip extension configuration during sdist creation
+    if is_building_sdist():
+        print("Building sdist - skipping extension configuration")
+        return ext
 
     # modify the extension to taste
     add_X11(ext)
