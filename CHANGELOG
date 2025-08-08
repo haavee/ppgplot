@@ -1,3 +1,9 @@
+version 1.6
+  - Python2/3 compatibility, numpy 1.x/2.x compatibility
+  - github actions to build wheels and publish to (test)PyPI
+  - setup.py can build source dists
+version 1.5*
+  - Fake version for experimenting w/ PyPI by n00b
 version 1.4
   - Now ppgplot uses the "numpy" module by default, reverting to "numarray"
     and then "Numeric", respectively, if the preferred module is not found.

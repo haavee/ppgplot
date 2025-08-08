@@ -1,6 +1,11 @@
 
 PPGPLOT CONTRIBUTORS:
 
+Marjolein Verkouter continued supporting a fork of NickP's repo, making it
+Py2/Py3, numpy1.x/2.x  compatible, and make the extension pip-installable.
+Added some functionality and incorporated patches from C. Bassa on his fork
+of the original repo.
+
 Steven Bamford adapted ppgplot in 2007 to use numpy, in favour of the
 depreciated numarray and Numeric modules, and included these minor
 changes (mostly to setup.py) in the Google Code version (1.4) in April
