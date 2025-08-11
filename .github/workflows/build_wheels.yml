@@ -2,6 +2,8 @@ name: Build Wheels
 
 on:
   workflow_dispatch:
+  push:
+    branch: fix-*
 
 jobs:
   build_wheels:
