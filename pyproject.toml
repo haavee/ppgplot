@@ -1,5 +1,6 @@
+# https://numpy.org/devdocs/dev/depending_on_numpy.html#numpy-2-abi-handling
 [build-system]
-requires = ["setuptools>=45", "numpy>=1.21.0", "pkgconfig", "wheel", "cibuildwheel"]
+requires = ["setuptools>=45", "numpy>=2.0.0rc1", "pkgconfig", "wheel", "cibuildwheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -11,9 +12,9 @@ authors = [
     #{name = "Nick Patavalis", email = "npat@efault.net"},
 ]
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 dependencies = [
-    "numpy>=1.21.0",
+    "numpy>=1.19.0",
 #    "pkgconfig"
 ]
 
