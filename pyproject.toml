@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "python-pgplot"
-version = "1.6.0"
+version = "1.6.1"
 description = "Python bindings for PGPLOT"
 authors = [
     {name = "Marjolein Verkouter", email = "verkouter@jive.eu"},
@@ -42,4 +42,5 @@ package-dir = {"ppgplot" = "src"}
 # Test that giza is available
 before-build = "pkg-config --exists giza && echo 'giza found' || echo 'giza NOT found'"
 # Not on Windhoos, nor on musllinux (wtf)
-skip = ["*-win*", "*musllinux*" ]
+# No numpy2 on Py3.8 
+skip = ["*-win*", "*musllinux*", "cp38-*" ]
