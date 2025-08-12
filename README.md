@@ -32,7 +32,7 @@ It is also possible to build the package from this `git`-repository. You may nee
 
 ## Requirements
 
-- Python 3.7+
+- Python 3.9+
 - numpy >= 1.21.0
 - PGPLOT or Giza libraries installed
 - X11 development libraries

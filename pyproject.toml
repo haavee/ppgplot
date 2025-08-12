@@ -12,7 +12,7 @@ authors = [
     #{name = "Nick Patavalis", email = "npat@efault.net"},
 ]
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 dependencies = [
     "numpy>=1.19.0",
 #    "pkgconfig"
