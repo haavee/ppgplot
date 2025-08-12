@@ -1,5 +1,5 @@
 {% set name = "python-pgplot" %}
-{% set version = "1.6.0" %}
+{% set version = "1.6.1" %}
 
 package:
   name: {{ name|lower }}
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/python_pgplot-{{ version }}.tar.gz
-  sha256: 3af95c1aafd78994c6b46b4c478584c033eef32affb82c3c1d4e7fe07f6df48d
+  sha256: 0ac1cd4808a5b80a6e79dea4562ac4201028818ca890abf8cb06186585858919
 
 build:
   number: 0
