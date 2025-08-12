@@ -48,7 +48,6 @@ about:
   home: https://github.com/haavee/ppgplot
   license: GPL-3.0-or-later
   license_family: GPL
-  license_file: LICENSE
   summary: Python bindings for PGPLOT
   description: |
     Python bindings for PGPLOT graphics library. PGPLOT is a Fortran- or 

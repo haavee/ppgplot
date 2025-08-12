@@ -10,6 +10,14 @@ cd giza-1.4.2
 
 # Configure and build giza
 export CFLAGS=-fPIC
+
+# Update config.sub for ARM64 support
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # Download updated config.sub that recognizes arm64-apple-darwin
+    wget -O build/config.sub 'https://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD'
+    chmod +x build/config.sub
+fi
+
 ./configure --prefix=${PREFIX}
 make -j${CPU_COUNT}
 make install
