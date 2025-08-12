@@ -22,10 +22,11 @@
 #include <cpgplot.h>
 
 /* It's 2025, we only support numpy anymore */
+/* Target NumPy 1.19 API for maximum compatibility while avoiding deprecated APIs */
 #ifndef NPY_TARGET_VERSION
-    #define NPY_TARGET_VERSION NPY_API_VERSION
+    #define NPY_TARGET_VERSION NPY_1_19_API_VERSION
 #endif
-#define NPY_NO_DEPRECATED_API NPY_TARGET_VERSION/*NPY_1_7_API_VERSION*/
+#define NPY_NO_DEPRECATED_API NPY_TARGET_VERSION
 #include <numpy/ndarrayobject.h>
 #include <numpy/ndarraytypes.h>
 
