@@ -11,7 +11,26 @@ manipulate vectors and matrices.
 
 ## Installing
 
-Since `v1.5` (Apr 2025) the package should be `pip`-installable; it's a package on the [PyPI](https://pypi.org/project/python-pgplot/):
+### Option 1: Conda (Recommended)
+
+The easiest way to install `python-pgplot` is via conda-forge, which automatically handles all system dependencies:
+
+```bash
+    $> conda install -c conda-forge python-pgplot
+    $> python3
+    >>> import ppgplot
+    >>>
+```
+
+This method automatically installs and configures:
+- Giza graphics library
+- Cairo graphics backend
+- X11 libraries (Linux)
+- All required development headers
+
+### Option 2: PyPI
+
+Since `v1.5` (Apr 2025) the package is also available on [PyPI](https://pypi.org/project/python-pgplot/):
 
 ```bash
     $> pip install python-pgplot
@@ -21,6 +40,9 @@ Since `v1.5` (Apr 2025) the package should be `pip`-installable; it's a package 
 ```
 **NOTE: Due to a package name collision, the PyPI project name is `python-pgplot`; the obvious package name was already claimed by something completely different**
 
+**Important:** PyPI installation requires system dependencies (see Requirements section below) to be manually installed first.
+
+### Option 3: From Source
 
 It is also possible to build the package from this `git`-repository. You may need to create a Python [`venv`](https://docs.python.org/3/library/venv.html) first. See below for detailed instructions.
 
