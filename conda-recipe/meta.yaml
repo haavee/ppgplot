@@ -48,7 +48,8 @@ test:
 
 about:
   home: https://github.com/haavee/ppgplot
-  license: GPL-3.0-or-later
+  license: LGPL-2.0-only
+  license_file: LICENSE
   license_family: GPL
   summary: Python bindings for PGPLOT
   description: |
