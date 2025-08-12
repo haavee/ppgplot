@@ -9,7 +9,10 @@ tar -xzf v1.4.2.tar.gz
 cd giza-1.4.2
 
 # Configure and build giza
-export CFLAGS=-fPIC
+export CFLAGS="-fPIC"
+export CXXFLAGS="-fPIC"
+export LDFLAGS="-L${PREFIX}/lib"
+export CPPFLAGS="-I${PREFIX}/include"
 
 # Update config.sub for ARM64 support
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -18,7 +21,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     chmod +x build/config.sub
 fi
 
-./configure --prefix=${PREFIX}
+./configure --prefix=${PREFIX} --enable-shared
 make -j${CPU_COUNT}
 make install
 
