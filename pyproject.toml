@@ -9,13 +9,23 @@ version = "1.6.1"
 description = "Python bindings for PGPLOT"
 authors = [
     {name = "Marjolein Verkouter", email = "verkouter@jive.eu"},
-    #{name = "Nick Patavalis", email = "npat@efault.net"},
+    {name = "Nick Patavalis" },
+    {name = "MA Breddels" },
+    {name = "C Bassa" }
+]
+maintainers = [
+    {name = "Marjolein Verkouter", email = "verkouter@jive.eu"}
 ]
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
     "numpy>=1.19.0",
 #    "pkgconfig"
+]
+license = "LGPL-2.0-only"
+license-files = [
+    "LICENSE",
+    "AUTHORS"
 ]
 
 [external]
