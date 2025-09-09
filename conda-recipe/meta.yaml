@@ -21,8 +21,6 @@ requirements:
     - pkg-config
     - make
     - wget  # [unix]
-    - tar   # [unix]
-    - gzip  # [unix]
     - xorg-libx11
   host:
     - python
@@ -49,8 +47,8 @@ test:
 about:
   home: https://github.com/haavee/ppgplot
   license: LGPL-2.0-only
-  license_file: LICENSE
-  license_family: GPL
+  # license_file: LICENSE  # Uncomment when LICENSE is included in PyPI distribution
+  license_family: LGPL
   summary: Python bindings for PGPLOT
   description: |
     Python bindings for PGPLOT graphics library. PGPLOT is a Fortran- or 

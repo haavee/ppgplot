@@ -1,4 +1,4 @@
-include INSTALL README CHANGELOG CONTRIBUTORS MANIFEST.in
+include INSTALL README CHANGELOG CONTRIBUTORS MANIFEST.in LICENSE
 include Makefile
 include setup.py
 recursive-include src *.c *.h *.py
