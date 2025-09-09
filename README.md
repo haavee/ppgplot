@@ -22,6 +22,19 @@ The easiest way to install `python-pgplot` is via conda-forge, which automatical
     >>>
 ```
 
+**NOTE**
+
+Whilst waiting for `conda-forge` to accept the recipes into its channel, it is possible to do a local conda build of the package(s):
+
+```bash
+$> conda install conda-build
+# for the binary dependency
+$> cd /path/to/clone-of-ppgplot-rep
+$> conda build conda-recipe/
+[wait]
+$> conda install --use-local python-pgplot
+```
+
 This method automatically installs and configures:
 - Giza graphics library
 - Cairo graphics backend
