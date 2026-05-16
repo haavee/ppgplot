@@ -22,7 +22,7 @@ requirements:
     - make
     - wget  # [unix]
     - xorg-libx11
-    - giza-dev
+    - giza
   host:
     - python
     - pip
@@ -36,6 +36,7 @@ requirements:
   run:
     - python
     - {{ pin_compatible('numpy') }}
+    - giza
     - cairo
     - xorg-libx11
 
